@@ -1,0 +1,11 @@
+hazehenry\autoreport\modules\chatlog\command\ChatLog.class
+hazehenry\autoreport\data\ProfileListener.class
+hazehenry\autoreport\data\handler\JsonLoader.class
+hazehenry\autoreport\data\ProfileManager.class
+hazehenry\autoreport\ReloadConfig.class
+hazehenry\autoreport\modules\wordsuggestion\WordSuggestCommand.class
+hazehenry\autoreport\AutoReport.class
+hazehenry\autoreport\modules\report\command\AutoReportCommand.class
+hazehenry\autoreport\data\Profile.class
+hazehenry\autoreport\commands\ArAdminPanel.class
+hazehenry\autoreport\modules\chatlog\listener\ChatLogListener.class

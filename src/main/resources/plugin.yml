@@ -1,0 +1,7 @@
+name: AutoReport
+version: '${project.version}'
+main: hazehenry.autoreport.AutoReport
+api-version: '1.18'
+commands:
+  autoreport:
+  chatlog:
