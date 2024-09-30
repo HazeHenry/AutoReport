@@ -4,13 +4,15 @@ import hazehenry.autoreport.AutoReport;
 import hazehenry.autoreport.data.Profile;
 import hazehenry.autoreport.data.ProfileManager;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.time.LocalTime;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,17 +32,33 @@ public class AutoReportCommand implements CommandExecutor {
                 p.sendMessage("§cAdj meg egy játékost!");
                 return true;
             }
+
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[0]);
+            if (!offlinePlayer.hasPlayedBefore() && !offlinePlayer.isOnline()) {
+                p.sendMessage("§cEz a játékos nem játszott a szerveren.");
+                return true;
+            }
+            if (!offlinePlayer.isOnline()) {
+                p.sendMessage("§cOffline játékost nem tudsz feljelenteni.");
+                return true;
+            }
+
             Player player = Bukkit.getPlayer(args[0]);
             if (player == p) {
                 p.sendMessage("§cMagadat nem tudod feljelenteni.");
             } else {
-                List<Player> players = recentlyReported.get(p);
-                if (!recentlyReported.containsKey(player)) {
-                    if (players.contains(p)) {
+                List<Player> players;
+                if (!recentlyReported.containsKey(p)) {
+                    players = new ArrayList<>();
+                } else {
+                    players = recentlyReported.get(p);
+                }
+                if (recentlyReported.containsKey(p)) {
+                    if (players.contains(player)) {
                         p.sendMessage("§cEzt a játékost nem tudod jelenleg feljelenteni, várnod kell kicsit.");
                         return true;
                     }
-                    p.sendMessage("§cReport sikeresen elküldve, hamarosan feldolgozásra kerül...");
+                    p.sendMessage("§aReport sikeresen elküldve, hamarosan feldolgozásra kerül...");
                     Bukkit.getScheduler().runTaskAsynchronously(AutoReport.getInstance(), () -> handleReport(player, p));
                     players.add(player);
                     recentlyReported.put(p, players);
@@ -50,7 +68,7 @@ public class AutoReportCommand implements CommandExecutor {
                         recentlyReported.put(p, players);
                     }, 120 * 20L);
                 }
-                p.sendMessage("§cReport sikeresen elküldve, hamarosan feldolgozásra kerül...");
+                p.sendMessage("§aReport sikeresen elküldve, hamarosan feldolgozásra kerül...");
                 Bukkit.getScheduler().runTaskAsynchronously(AutoReport.getInstance(), () -> handleReport(player, p));
                 players.add(player);
                 recentlyReported.put(p, players);
@@ -73,14 +91,15 @@ public class AutoReportCommand implements CommandExecutor {
         int i = 0;
         for (String message : chatmessages) {
             if (!message.contains(getCurrentTime())) continue;
-            i++; if (i > 100) break;
+            message = ChatColor.stripColor(message);
+            if (profile.getChatLogFiltered().contains(message)) continue;
+            i++; if (i > 75) break;
             String[] splitmessage = message.split("\\s");
             for (String word : blacklist) {
                 for (String fword : splitmessage) {
-                    System.out.println(fword);
                     if (fword.equalsIgnoreCase(word)) {
                         dContain = true;
-                        System.out.println("found word: " + fword);
+                        profile.getChatLogFiltered().add(message);
                         break;
                     }
                 }
@@ -88,23 +107,25 @@ public class AutoReportCommand implements CommandExecutor {
         }
         p.sendMessage("§aAnalisztika befejezve.");
         if (dContain) {
-            p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 0.5f);
-            p.sendMessage("§c§lAUTO REPORT §8» §fA játékosnál §a§ntaláltunk§r §fchat violationt. A játékos §6§nnémítva§r §flett");
+            p.playSound(p.getLocation(), Sound.LEVEL_UP, 1f, 0.5f);
+            p.sendMessage("§c§lAUTO REPORT §8» §fA játékosnál §a§ntaláltunk§r §fchat violationt. A játékos §6§nnémítva§r §flett. Köszönjük a segítséget!");
             int violations = profile.getChatViolations();
+            violations++;
             int muteMinutes = violations * 30;
-            profile.setChatViolations(violations + 1);
+            profile.setChatViolations(violations);
             profileManager.saveProfile(player.getUniqueId());
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mute " + player.getName() + " " + muteMinutes + "m AutoReport - Chat Helytelen Használata (#" + violations + ") -s");
+            int finalViolations = violations;
+            Bukkit.getScheduler().runTask(AutoReport.getInstance(), () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mute " + player.getName() + " " + muteMinutes + "m AutoReport - Chat Helytelen Használata (#" + finalViolations + ") -s"));
             return;
         }
-        p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
+        p.playSound(p.getLocation(), Sound.VILLAGER_NO, 1f, 1f);
         p.sendMessage("§c§lAUTO REPORT §8» §fA játékosnál §c§nnem§r §ftaláltunk semmi némíthatót.");
     }
 
     private String getCurrentTime() {
-        LocalTime now = LocalTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm:ss");
-        return now.format(formatter);
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return today.format(formatter);
     }
 
 }

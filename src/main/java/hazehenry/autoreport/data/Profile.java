@@ -16,6 +16,7 @@ public class Profile {
     private UUID uuid;
 
     private List<String> chatLog = new ArrayList<>();
+    private List<String> chatLogFiltered = new ArrayList<>();
     private int chatViolations = 0;
 
 

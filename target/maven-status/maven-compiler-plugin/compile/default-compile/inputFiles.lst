@@ -1,2 +1,11 @@
 D:\Letöltések\AutoReport\src\main\java\hazehenry\autoreport\AutoReport.java
-D:\Letöltések\AutoReport\src\main\java\hazehenry\autoreport\ReportHandler.java
+D:\Letöltések\AutoReport\src\main\java\hazehenry\autoreport\modules\chatlog\command\ChatLog.java
+D:\Letöltések\AutoReport\src\main\java\hazehenry\autoreport\modules\report\command\AutoReportCommand.java
+D:\Letöltések\AutoReport\src\main\java\hazehenry\autoreport\data\ProfileListener.java
+D:\Letöltések\AutoReport\src\main\java\hazehenry\autoreport\commands\ArAdminPanel.java
+D:\Letöltések\AutoReport\src\main\java\hazehenry\autoreport\modules\wordsuggestion\WordSuggestCommand.java
+D:\Letöltések\AutoReport\src\main\java\hazehenry\autoreport\modules\chatlog\listener\ChatLogListener.java
+D:\Letöltések\AutoReport\src\main\java\hazehenry\autoreport\data\ProfileManager.java
+D:\Letöltések\AutoReport\src\main\java\hazehenry\autoreport\data\handler\JsonLoader.java
+D:\Letöltések\AutoReport\src\main\java\hazehenry\autoreport\ReloadConfig.java
+D:\Letöltések\AutoReport\src\main\java\hazehenry\autoreport\data\Profile.java

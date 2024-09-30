@@ -31,7 +31,7 @@ public class WordSuggestCommand implements CommandExecutor {
         String word = args[0];
         recentlySuggested.add(p);
         p.sendMessage("§c§lAUTOREPORT §8» §fKöszönjük a szóajánlást! §6" + word + "§r hamarosan egy admin reviewolja az ajánlásokat!");
-        p.playSound(p.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1f);
+        p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1f, 1f);
         AutoReport.getInstance().getConfig().getStringList("suggestedwords").add(word);
         AutoReport.getInstance().saveConfig();
         return true;
