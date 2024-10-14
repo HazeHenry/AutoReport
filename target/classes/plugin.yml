@@ -1,7 +1,7 @@
 name: AutoReport
 version: '1.0'
 main: hazehenry.autoreport.AutoReport
-api-version: '1.8'
+api-version: '1.18'
 commands:
   autoreport:
     aliases:

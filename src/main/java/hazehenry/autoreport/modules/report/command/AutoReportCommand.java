@@ -107,18 +107,18 @@ public class AutoReportCommand implements CommandExecutor {
         }
         p.sendMessage("§aAnalisztika befejezve.");
         if (dContain) {
-            p.playSound(p.getLocation(), Sound.LEVEL_UP, 1f, 0.5f);
+            p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1f, 0.5f);
             p.sendMessage("§c§lAUTO REPORT §8» §fA játékosnál §a§ntaláltunk§r §fchat violationt. A játékos §6§nnémítva§r §flett. Köszönjük a segítséget!");
             int violations = profile.getChatViolations();
             violations++;
-            int muteMinutes = violations * 30;
+            int muteMinutes = violations * 20;
             profile.setChatViolations(violations);
             profileManager.saveProfile(player.getUniqueId());
             int finalViolations = violations;
             Bukkit.getScheduler().runTask(AutoReport.getInstance(), () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mute " + player.getName() + " " + muteMinutes + "m AutoReport - Chat Helytelen Használata (#" + finalViolations + ") -s"));
             return;
         }
-        p.playSound(p.getLocation(), Sound.VILLAGER_NO, 1f, 1f);
+        p.playSound(p.getLocation(), Sound.ENTITY_VILLAGER_NO, 1f, 1f);
         p.sendMessage("§c§lAUTO REPORT §8» §fA játékosnál §c§nnem§r §ftaláltunk semmi némíthatót.");
     }
 
