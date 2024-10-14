@@ -11,3 +11,11 @@ commands:
   chatlog:
     aliases:
       - cl
+  suggestword:
+    aliases:
+      - sw
+      - suggest
+  arp:
+    aliases:
+      - autoreportpanel
+      - arpanel

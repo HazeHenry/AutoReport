@@ -79,7 +79,7 @@ public class ChatLog implements CommandExecutor {
             }
 
             p.sendMessage("§8§m---------------§r §6" + page + "/" + totalPages + " §8§m---------------§r");
-            p.sendMessage("§e" + p.getName() + " §ajátékos chat logja");
+            p.sendMessage("§e" + player.getName() + " §ajátékos chat logja");
             p.sendMessage("");
 
             int start = (page - 1) * MESSAGES_PER_PAGE;

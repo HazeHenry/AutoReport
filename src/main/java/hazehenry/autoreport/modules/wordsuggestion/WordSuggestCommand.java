@@ -1,7 +1,10 @@
 package hazehenry.autoreport.modules.wordsuggestion;
 
 import hazehenry.autoreport.AutoReport;
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -32,8 +35,11 @@ public class WordSuggestCommand implements CommandExecutor {
         recentlySuggested.add(p);
         p.sendMessage("§c§lAUTOREPORT §8» §fKöszönjük a szóajánlást! §6" + word + "§r hamarosan egy admin reviewolja az ajánlásokat!");
         p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1f, 1f);
-        AutoReport.getInstance().getConfig().getStringList("suggestedwords").add(word);
+        List<String> suggestedWords = AutoReport.getInstance().getSuggestedWords();
+        suggestedWords.add(word);
+        AutoReport.getInstance().getConfig().set("suggestedwords", suggestedWords);
         AutoReport.getInstance().saveConfig();
+        Bukkit.getScheduler().runTaskLater(AutoReport.getInstance(), () -> recentlySuggested.remove(p), 120 * 20L);
         return true;
     }
 }
