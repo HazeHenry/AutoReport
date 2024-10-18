@@ -3,31 +3,65 @@ wordlist:
   - anyad
   - anyd
   - anyud
+  - autista
+  - autist
+  - anyá#
+  - b@sználak
+  - b@szlak
   - f@sz
   - fasz
   - f.sz
   - fsz
   - faszfej
+  - csicska
+  - cigá@y
   - fszfej
   - f4sz
   - f4szfej
   - f4szfj
+  - r@hadék
+  - r@hadé
+  - rohadék
+  - r@hadek
   - k@r
   - kur
   - k.rva
+  - k.va
   - krva
   - kurv
+  - kurv@
+  - kur@@
+  - kutrva
   - b@sz
   - basz
+  - bszdmeg
+  - baszdmeg
+  - ba---eg
+  - ba-eg
+  - ba--eg
+  - buz1
+  - b@z1
+  - gyökér
+  - gy0kér
+  - gy0k3r
+  - roh@gyatok
   - b.szd
   - geci
   - g.ci
+  - gci
+  - ge-ci
+  - ge--ci
   - gci
   - puni
   - punci
   - p.nc
   - pina
   - p1na
+  - picsa
+  - picsá
+  - p1csa
+  - p1cs4
+  - pics4
   - szar
   - szr
   - sz@r
@@ -50,5 +84,9 @@ wordlist:
   - fuk
   - fck
   - fuk
+  - kys
+  - ky$
+  - i<ys
+  - i<y$
 
 suggestedwords:

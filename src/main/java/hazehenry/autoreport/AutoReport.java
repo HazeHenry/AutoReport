@@ -5,7 +5,7 @@ import hazehenry.autoreport.data.ProfileListener;
 import hazehenry.autoreport.data.ProfileManager;
 import hazehenry.autoreport.modules.chatlog.command.ChatLog;
 import hazehenry.autoreport.modules.chatlog.listener.ChatLogListener;
-import hazehenry.autoreport.modules.report.command.AutoReportCommand;
+import hazehenry.autoreport.modules.report.AutoReportCommand;
 import hazehenry.autoreport.modules.wordsuggestion.WordSuggestCommand;
 import lombok.Getter;
 import org.bukkit.Bukkit;

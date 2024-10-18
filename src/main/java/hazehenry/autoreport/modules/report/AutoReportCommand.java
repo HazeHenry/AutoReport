@@ -1,4 +1,4 @@
-package hazehenry.autoreport.modules.report.command;
+package hazehenry.autoreport.modules.report;
 
 import hazehenry.autoreport.AutoReport;
 import hazehenry.autoreport.data.Profile;
@@ -44,40 +44,54 @@ public class AutoReportCommand implements CommandExecutor {
             }
 
             Player player = Bukkit.getPlayer(args[0]);
+
             if (player == p) {
                 p.sendMessage("§cMagadat nem tudod feljelenteni.");
+                return false;
+            }
+
+            if (player.hasPermission("bc.staff")) {
+                p.sendMessage("§cEzt a játékost nem tudod feljelenteni!");
+                return false;
+            }
+
+            List<Player> players;
+            if (!recentlyReported.containsKey(p)) {
+                players = new ArrayList<>();
             } else {
-                List<Player> players;
-                if (!recentlyReported.containsKey(p)) {
-                    players = new ArrayList<>();
-                } else {
-                    players = recentlyReported.get(p);
-                }
-                if (recentlyReported.containsKey(p)) {
-                    if (players.contains(player)) {
-                        p.sendMessage("§cEzt a játékost nem tudod jelenleg feljelenteni, várnod kell kicsit.");
-                        return true;
-                    }
-                    p.sendMessage("§aReport sikeresen elküldve, hamarosan feldolgozásra kerül...");
-                    Bukkit.getScheduler().runTaskAsynchronously(AutoReport.getInstance(), () -> handleReport(player, p));
-                    players.add(player);
-                    recentlyReported.put(p, players);
-                    Bukkit.getScheduler().runTaskLater(AutoReport.getInstance(), () -> {
-                        players.remove(p);
-                        if (players.isEmpty()) { recentlyReported.remove(p); return; }
-                        recentlyReported.put(p, players);
-                    }, 120 * 20L);
+                players = recentlyReported.get(p);
+            }
+
+            if (recentlyReported.containsKey(p)) {
+                if (players.contains(player)) {
+                    p.sendMessage("§cEzt a játékost nem tudod jelenleg feljelenteni, várnod kell kicsit.");
+                    return true;
                 }
                 p.sendMessage("§aReport sikeresen elküldve, hamarosan feldolgozásra kerül...");
                 Bukkit.getScheduler().runTaskAsynchronously(AutoReport.getInstance(), () -> handleReport(player, p));
                 players.add(player);
                 recentlyReported.put(p, players);
                 Bukkit.getScheduler().runTaskLater(AutoReport.getInstance(), () -> {
-                    players.remove(player);
-                    if (players.isEmpty()) { recentlyReported.remove(p); return; }
+                    players.remove(p);
+                    if (players.isEmpty()) {
+                        recentlyReported.remove(p);
+                        return;
+                    }
                     recentlyReported.put(p, players);
                 }, 120 * 20L);
             }
+            p.sendMessage("§aReport sikeresen elküldve, hamarosan feldolgozásra kerül...");
+            Bukkit.getScheduler().runTaskAsynchronously(AutoReport.getInstance(), () -> handleReport(player, p));
+            players.add(player);
+            recentlyReported.put(p, players);
+            Bukkit.getScheduler().runTaskLater(AutoReport.getInstance(), () -> {
+                players.remove(player);
+                if (players.isEmpty()) {
+                    recentlyReported.remove(p);
+                    return;
+                }
+                recentlyReported.put(p, players);
+            }, 120 * 20L);
         }
         return true;
     }
@@ -116,10 +130,15 @@ public class AutoReportCommand implements CommandExecutor {
             profileManager.saveProfile(player.getUniqueId());
             int finalViolations = violations;
             Bukkit.getScheduler().runTask(AutoReport.getInstance(), () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mute " + player.getName() + " " + muteMinutes + "m AutoReport - Chat Helytelen Használata (#" + finalViolations + ") -s"));
+            for (Player staff : Bukkit.getOnlinePlayers()) {
+                if (staff.hasPermission("bc.staff")) {
+                    staff.sendMessage("§c§lAUTOREPORT §8» §6Játékos §b§n" + player + "§r §cnémítva lett report által.");
+                }
+            }
             return;
         }
         p.playSound(p.getLocation(), Sound.VILLAGER_NO, 1f, 1f);
-        p.sendMessage("§c§lAUTO REPORT §8» §fA játékosnál §c§nnem§r §ftaláltunk semmi némíthatót.");
+        p.sendMessage("§c§lAUTO REPORT §8» §fA játékosnál §c§nnem§r §ftaláltunk chat violationt.");
     }
 
     private String getCurrentTime() {

@@ -23,10 +23,11 @@ public class ArAdminPanel implements CommandExecutor {
         if (args.length < 1) {
             p.sendMessage("§c§lAUTOREPORT ADMIN PANEL");
             p.sendMessage("");
-            p.sendMessage("§a/ap wordsuggestions §8- §7Review player suggested words.");
-            p.sendMessage("§a/ap addword §8- §7Add a word to the blacklist.");
-            p.sendMessage("§a/ap removeword §8- §7Remove a word from the blacklist.");
-            p.sendMessage("§a/ap list §8- §7List all words in the list.");
+            p.sendMessage("§a/arp wordsuggestions §8- §7Review player suggested words.");
+            p.sendMessage("§a/arp addword §8- §7Add a word to the blacklist.");
+            p.sendMessage("§a/arp removeword §8- §7Remove a word from the blacklist.");
+            p.sendMessage("§a/arp list §8- §7List all words in the list.");
+            p.sendMessage("§a/arp reload §8- §7Reload the config.");
             return true;
         }
 
@@ -126,6 +127,11 @@ public class ArAdminPanel implements CommandExecutor {
                 }
                 p.sendMessage(clampWord.toString());
                 p.sendMessage("§8§m---------------------------");
+                break;
+            case "reload":
+                AutoReport.getInstance().reloadConfig();
+                AutoReport.getInstance().saveConfig();
+                p.sendMessage("§aConfiguration reloaded.");
                 break;
         }
         return true;
