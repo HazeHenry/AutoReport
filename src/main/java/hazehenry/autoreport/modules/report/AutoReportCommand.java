@@ -108,6 +108,11 @@ public class AutoReportCommand implements CommandExecutor {
             message = ChatColor.stripColor(message);
             if (profile.getChatLogFiltered().contains(message)) continue;
             i++; if (i > 75) break;
+            if (capsChecker(message)) {
+                dContain = true;
+                profile.getChatLogFiltered().add(message);
+                break;
+            }
             String[] splitmessage = message.split("\\s");
             for (String word : blacklist) {
                 for (String fword : splitmessage) {
@@ -145,6 +150,18 @@ public class AutoReportCommand implements CommandExecutor {
         LocalDate today = LocalDate.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return today.format(formatter);
+    }
+
+    public boolean capsChecker(String message) {
+        int caps = 0;
+        int length = message.length();
+        String[] splitMessage = message.split("");
+        for (String entry : splitMessage) {
+            if (entry.equals(entry.toUpperCase())) {
+                caps++;
+            }
+        }
+        return caps >= length * 0.7;
     }
 
 }
