@@ -3,6 +3,7 @@ package hazehenry.autoreport;
 import hazehenry.autoreport.commands.ArAdminPanel;
 import hazehenry.autoreport.data.ProfileListener;
 import hazehenry.autoreport.data.ProfileManager;
+import hazehenry.autoreport.modules.chatban.ChatListener;
 import hazehenry.autoreport.modules.chatlog.command.ChatLog;
 import hazehenry.autoreport.modules.chatlog.listener.ChatLogListener;
 import hazehenry.autoreport.modules.report.AutoReportCommand;
@@ -20,6 +21,8 @@ public final class AutoReport extends JavaPlugin {
 
     @Getter
     private ProfileManager profileManager;
+
+
 
     @Override
     public void onEnable() {
@@ -44,6 +47,7 @@ public final class AutoReport extends JavaPlugin {
     public void registerEvents() {
         Bukkit.getPluginManager().registerEvents(new ProfileListener(),this);
         Bukkit.getPluginManager().registerEvents(new ChatLogListener(),this);
+        Bukkit.getPluginManager().registerEvents(new ChatListener(),this);
     }
 
     public List<String> getSuggestedWords() {

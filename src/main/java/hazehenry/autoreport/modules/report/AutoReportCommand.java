@@ -17,12 +17,15 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AutoReportCommand implements CommandExecutor {
 
     ProfileManager profileManager = AutoReport.getInstance().getProfileManager();
 
     private HashMap<Player, List<Player>> recentlyReported = new HashMap<>();
+
+    private final String serverSwitch = "KSFFA";
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -101,8 +104,11 @@ public class AutoReportCommand implements CommandExecutor {
         List<String> chatmessages = profile.getChatLog();
         List<String> blacklist = AutoReport.getInstance().getConfig().getStringList("wordlist");
         p.sendMessage("§aAnalisztika elindítása...");
+
         boolean dContain = false;
         int i = 0;
+        String type = "Chat Helytelen Használata";
+
         for (String message : chatmessages) {
             if (!message.contains(getCurrentTime())) continue;
             message = ChatColor.stripColor(message);
@@ -110,35 +116,75 @@ public class AutoReportCommand implements CommandExecutor {
             i++; if (i > 75) break;
             if (capsChecker(message)) {
                 dContain = true;
+                type = "Caps";
                 profile.getChatLogFiltered().add(message);
                 break;
             }
+
             String[] splitmessage = message.split("\\s");
             for (String word : blacklist) {
                 for (String fword : splitmessage) {
                     if (fword.equalsIgnoreCase(word)) {
                         dContain = true;
+                        type = "Blacklist";
                         profile.getChatLogFiltered().add(message);
                         break;
                     }
                 }
             }
         }
+
+        List<String> tempMessages = new ArrayList<>();
+
+        for (String temp : chatmessages) {
+            if (!temp.contains(getCurrentTime())) continue;
+            temp = ChatColor.stripColor(temp);
+            if (profile.getChatLogFiltered().contains(temp)) continue;
+            tempMessages.add(temp);
+        }
+
+        Map<Boolean, String> spam = spamChecker(tempMessages);
+        if (spam != null && spam.containsKey(true)) {
+            dContain = true;
+            type = "Spam";
+            profile.getChatLogFiltered().add(spam.get(true));
+        }
+
         p.sendMessage("§aAnalisztika befejezve.");
         if (dContain) {
             p.playSound(p.getLocation(), Sound.LEVEL_UP, 1f, 0.5f);
-            p.sendMessage("§c§lAUTO REPORT §8» §fA játékosnál §a§ntaláltunk§r §fchat violationt. A játékos §6§nnémítva§r §flett. Köszönjük a segítséget!");
             int violations = profile.getChatViolations();
             violations++;
-            int muteMinutes = violations * 30;
-            profile.setChatViolations(violations);
-            profileManager.saveProfile(player.getUniqueId());
-            int finalViolations = violations;
-            Bukkit.getScheduler().runTask(AutoReport.getInstance(), () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mute " + player.getName() + " " + muteMinutes + "m AutoReport - Chat Helytelen Használata (#" + finalViolations + ") -s"));
-            for (Player staff : Bukkit.getOnlinePlayers()) {
-                if (staff.hasPermission("bc.staff")) {
-                    staff.sendMessage("§c§lAUTOREPORT §8» §6Játékos §b§n" + player + "§r §cnémítva lett report által.");
+            if (!serverSwitch.equalsIgnoreCase("KSFFA")) {
+                int muteMinutes = violations * 30;
+                profile.setChatViolations(violations);
+                profileManager.saveProfile(player.getUniqueId());
+                int finalViolations = violations;
+                Bukkit.getScheduler().runTask(AutoReport.getInstance(), () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mute " + player.getName() + " " + muteMinutes + "m AutoReport - Chat Helytelen Használata (#" + finalViolations + ") -s"));
+                p.sendMessage("§c§lAUTO REPORT §8» §fA játékosnál §a§ntaláltunk§r §fchat violationt. A játékos §6§nnémítva§r §flett. Köszönjük a segítséget!");
+                for (Player staff : Bukkit.getOnlinePlayers()) {
+                    if (!staff.hasPermission("bc.staff")) continue;
+                    staff.sendMessage("§c§lAUTOREPORT §8» §6Játékos §b§n" + player + "§r §cnémítva lett report által. [" + type + "]");
                 }
+            } else {
+                if (violations >= 3) {
+                    List<String> naughtyPlayers;
+                    if (AutoReport.getInstance().getConfig().getStringList("naughtyplayers") != null) {
+                        naughtyPlayers = AutoReport.getInstance().getConfig().getStringList("naughtyplayers");
+                    } else {
+                        naughtyPlayers = new ArrayList<>();
+                    }
+
+                    naughtyPlayers.add(player.getName());
+                    AutoReport.getInstance().getConfig().set("naughtyplayers", naughtyPlayers);
+                    p.sendMessage("§c§lAUTO REPORT §8» §fA játékosnál §a§ntaláltunk§r §fchat violationt. A játékos §6chatbannolva§r §flett. Köszönjük a segítséget!");
+
+                    for (Player staff : Bukkit.getOnlinePlayers()) {
+                        if (!staff.hasPermission("bc.staff")) continue;
+                        staff.sendMessage("§c§lAUTOREPORT §8» §6Játékos §b§n" + player + "§r §cnémítva lett report által. [" + type + "]");
+                    }
+                }
+                p.sendMessage("§c§lAUTO REPORT §8» §fA játékosnál §a§ntaláltunk§r §fchat violationt. A játékos kapott egy extra strikeot!");
             }
             return;
         }
@@ -155,6 +201,7 @@ public class AutoReportCommand implements CommandExecutor {
     public boolean capsChecker(String message) {
         int caps = 0;
         int length = message.length();
+        if (length < 5) return false;
         String[] splitMessage = message.split("");
         for (String entry : splitMessage) {
             if (entry.equals(entry.toUpperCase())) {
@@ -162,6 +209,26 @@ public class AutoReportCommand implements CommandExecutor {
             }
         }
         return caps >= length * 0.7;
+    }
+
+    public Map<Boolean, String> spamChecker(List<String> list) {
+        Map<String, Integer> frequency = new HashMap<>();
+        for (String message : list) {
+            if (frequency.containsKey(message)) {
+                frequency.put(message, frequency.get(message) + 1);
+                continue;
+            }
+            frequency.put(message, 1);
+        }
+
+        System.out.println(frequency);
+
+        for (String message : frequency.keySet()) {
+            if (frequency.get(message) >= 5) {
+                return Map.of(true, message);
+            }
+        }
+        return null;
     }
 
 }

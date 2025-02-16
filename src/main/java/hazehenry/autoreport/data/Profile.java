@@ -19,7 +19,6 @@ public class Profile {
     private List<String> chatLogFiltered = new ArrayList<>();
     private int chatViolations = 0;
 
-
     public UUID getUuid() {
         return uuid;
     }

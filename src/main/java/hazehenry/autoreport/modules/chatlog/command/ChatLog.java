@@ -60,7 +60,7 @@ public class ChatLog implements CommandExecutor {
         return false;
     }
 
-    public void sendChatlogMessage(Player p, OfflinePlayer player, int page) {
+    public void sendChatlogMessage(CommandSender p, OfflinePlayer player, int page) {
         if (!player.hasPlayedBefore() && !player.isOnline()) {
             p.sendMessage(prefix +"§cEz a játékos nem játszott a szerveren.");
             return;
@@ -107,7 +107,12 @@ public class ChatLog implements CommandExecutor {
                     decorationLeft, previousPage, decorationMiddle, nextPage, decorationRight
             };
 
-            p.spigot().sendMessage(finalMessage);
+            if (p instanceof Player) {
+                ((Player) p).spigot().sendMessage(finalMessage);
+            }
+
+
+
         }
     }
 
